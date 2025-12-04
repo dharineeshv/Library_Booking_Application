@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin_Dashboard</title>
+  <script src="https://kit.fontawesome.com/6045d1d2eb.js" crossorigin="anonymous"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f2f5fb;
+    color: #222;
+}
+
+/* NAVBAR */
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 40%;
+    padding: 15px 20px;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* ADD SLOT BUTTON */
+#plus-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #0069e7;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.3em;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,115,255,0.4);
+    transition: 0.25s ease;
+}
+
+#plus-icon:hover {
+    background: #0053b5;
+    transform: translateY(-4px);
+}
+
+/* NO DATA MESSAGE */
+.no-datas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 30px;
+    margin: 25px;
+    border-radius: 12px;
+    color: #444;
+    
+    
+}
+
+.no-datas i {
+    font-size: 55px;
+    padding: 12px;
+    border-radius: 100px;
+    
+    color: #4a4a4a;
+}
+
+/* SLOT CARD */
+.container {
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    padding: 18px;
+    width: 90%;
+    margin: 20px auto;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    gap: 14px;
+    transition: box-shadow 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+}
+
+.container h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    color: #222;
+}
+
+.container p {
+    font-size: 0.95em;
+    color: #666;
+}
+
+/* SLOT HEADER */
+.container-1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.container-1 i {
+    color: #0069e7;
+    font-size: 1.2em;
+}
+
+/* DATE & TIME */
+.container-4 {
+    margin-left: 32px;
+    font-size: 0.95em;
+    color: #777;
+}
+
+/* SEAT ROW */
+.container-2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* BUTTON ROW */
+.container-3 {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+/* BUTTONS */
+button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.view-btn {
+    background: #007bff;
+    color: #fff;
+}
+
+.view-btn:hover {
+    background: #0064cc;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: #fff;
+}
+
+.delete-btn:hover {
+    background: #b92c38;
+}
+
+b {
+    font-size: 14px;
+    color: #0b63d6;
+}
+
+/* PROGRESSBAR OUTER */
+#a {
+    --fill-width: 0%;
+    border: 1px solid #c5c5c5;
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    padding: 2px;
+    background: transparent;
+}
+
+/* BLUE FILL */
+#a::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: var(--fill-width);
+    background: linear-gradient(90deg, #007bff, #58a8ff);
+    border-radius: 4px;
+    transition: width 800ms ease;
+}
+
+/* GRAY REMAINING */
+#a::after {
+    content: "";
+    position: absolute;
+    left: var(--fill-width);
+    height: 100%;
+    width: calc(100% - var(--fill-width));
+    background: #e6e6e6;
+    border-radius: 4px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: 14px;
+    }
+
+    .no-datas {
+        margin: 12px;
+        font-size: 0.95em;
+    }
+
+    #plus-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.9em;
+    }
+}
+/* PROGRESS BAR WRAPPER */
+.bar-wrapper {
+    width: 100%;
+    height: 12px;
+    background: #e4e4e4;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* BLUE FILL */
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007bff, #3f9cff);
+    border-radius: 6px;
+    width: 0%;
+    transition: width 0.8s ease;
+}
+
+</style>
+ 
+</head>
+<body>
+  <div class="nav-container">
+    
+     <i class="fa-regular fa-calendar calendar-btn"></i>
+    <input type="date" id="datePicker" style="visibility: hidden; position: absolute;">
+    <h2>Slot Management</h2>
+  </div>
+
+  <div id="plus-icon" title="Add slot">
+    <i class="fa-regular fa-plus fa-2xs" id="add-icon"></i>
+  </div>
+
+  <div class="no-datas">
+    <i class="fa-solid fa-calendar-xmark"></i>
+     <h3>No Available Slots!</h3>
+     <p>No Slots Added Yet. So Try adding a new slot.</p>
+  </div>
+
+<!-- This will hold multiple slot cards -->
+<div id="slotList"></div>
+
+
+  <script>
+    document.getElementById('plus-icon').addEventListener('click', function() {
+      // go to add slot page
+      window.location.href = 'add_slot.html';
+    });
+  </script>
+
+  <!-- Firebase + dynamic logic -->
+  <script type="module">
+    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+    const appSetting = {
+      databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
+    };
+    const app = initializeApp(appSetting);
+    const database = getDatabase(app);
+    const student_otp_db = ref(database, "Slots");
+
+    let selectedDate = "";
+    let date = new Date();
+    let day = String(date.getDate()).padStart(2, '0');
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let year = date.getFullYear();
+    selectedDate = year + '-' + month + '-' + day;
+
+
+
+datePicker.addEventListener('change', () => {
+  selectedDate = datePicker.value;
+  loadSlotsForDate(selectedDate);
+});
+
+function loadSlotsForDate(date) {
+  selectedDate = date;
+  let slotList = document.getElementById("slotList");
+  slotList.innerHTML = "";
+  let found = false;
+
+  onValue(student_otp_db, function (snapshot) {
+    if (snapshot.exists()) {
+      let data = snapshot.val();
+      for (let key in data) {
+        if (data[key].date === selectedDate) {
+          found = true;
+
+          let slot = data[key];
+          document.querySelector('.no-datas').style.display = 'none';
+
+          let card = document.createElement("div");
+          card.classList.add("container");
+          card.style.display = "flex";
+
+          card.innerHTML = `
+            <div class="container-1">
+              <i class="fa-solid fa-location-dot"></i>
+              <h3>${slot.venue}</h3>
+            </div>
+            <div class="container-4">
+              <p>${slot.date} • ${slot.start_time} - ${slot.end_time}</p>
+            </div>
+            <div class="container-2">
+              <div class="bar-wrapper">
+                <div class="bar-fill" style="width:0%"></div>
+              </div>
+              <b>${slot.booked_slots}/${slot.total_slots} Seats</b>
+            </div>
+            <div class="container-3">
+              <button class="view-btn" data-key="${key}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="delete-btn" data-key="${key}"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          `;
+
+          slotList.appendChild(card);
+
+          // percentage calculation
+          let percent = (slot.booked_slots / slot.total_slots) * 100;
+          let fill = card.querySelector(".bar-fill");
+          fill.style.width = percent + "%";
+        }
+      }
+    }
+
+    if (found) {
+      document.querySelector('.no-datas').style.display = 'none';
+      slotList.style.display = 'block';
+    } else {
+      document.querySelector('.no-datas').style.display = 'flex';
+      slotList.style.display = 'none';
+    }
+  }, { onlyOnce: true });
+}
+
+// Initial load
+loadSlotsForDate(selectedDate);
+
+
+
+
+document.querySelector('.calendar-btn').addEventListener('click', () => {
+    document.getElementById('datePicker').showPicker();
+});
+
+
+  </script>
+</body>
+</html>

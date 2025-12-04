@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slot Booking Application - Login Form</title>
+  <script
+    src="https://kit.fontawesome.com/6045d1d2eb.js"
+    crossorigin="anonymous"
+  ></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+
+    
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f7f9fc;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container-1 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .fa-solid.fa-graduation-cap {
+      font-size: 50px;
+      color: #0066ff;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 28px;
+      color: #333;
+    }
+
+    h2 {
+      margin-top: 5px;
+      font-weight: 400;
+      color: #555;
+    }
+
+    .login-container {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px 40px;
+      border-radius: 10px;
+      margin-top: 30px;
+      width: 380px;
+      max-width: 95vw;
+    }
+
+    label {
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      height: 36px;
+      border-radius: 6px;
+      border: 1.5px solid #ccc;
+      padding: 0 12px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+      outline-offset: 2px;
+      outline-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #0066ff;
+      outline-color: #66a3ff;
+    }
+
+    button {
+      width: 100%;
+      height: 40px;
+      border-radius: 6px;
+      border: none;
+      background-color: rgba(0, 102, 255, 0.9);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 25px;
+    }
+
+    button:hover {
+      background-color: rgba(0, 76, 191, 0.9);
+    }
+
+    #a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+      width: 100%;
+      gap: 5px;
+      margin-bottom: 25px;
+    }
+
+    #b,
+    #d {
+      border: 1px solid #000;
+      width: 100%;
+      height: 1px;
+      margin-top: 6px;
+    }
+
+    #c p {
+      margin: 0 10px;
+      font-weight: 600;
+      color: #777;
+      user-select: none;
+      font-size: 14px;
+    }
+
+    #google-btn {
+      background-color: rgba(0, 0, 0, 0.75);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 0 10px;
+    }
+
+    #google-btn img {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+      border-radius: 5px;
+    }
+
+    #google-btn:hover {
+      background-color: rgba(32, 32, 32, 0.85);
+    }
+
+    /* Responsive for smaller screens */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      .container-1 {
+        margin-top: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      .login-container {
+        padding: 25px 20px;
+        width: 100%;
+        max-width: 100vw;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        height: 34px;
+        font-size: 14px;
+        padding: 0 10px;
+      }
+
+      button {
+        height: 38px;
+        font-size: 16px;
+      }
+
+      #google-btn {
+        font-size: 14px;
+        gap: 8px;
+      }
+
+      #google-btn img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+<body>
+  <div class="container-1">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <h1>Sign in to your account</h1>
+    <h2>Welcome Back!</h2>
+  </div>
+  <div class="login-container">
+    <form action="login" method="post">
+      <label for="username">Email Address</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit">Sign In</button>
+
+      <div id="a">
+        <div id="b"></div>
+        <div id="c"><p>or</p></div>
+        <div id="d"></div>
+      </div>
+
+     
+        <div id="g_id_signin"></div>
+
+      
+    </form>
+  </div>
+</body>
+</html>
+<script>
+  function handleCredentialResponse(response) {
+    
+   
+    const userObject = parseJwt(response.credential);
+    const email = userObject.email;
+    sessionStorage.setItem('userEmail', email);
+
+    if(email.endsWith('@bitsathy.ac.in')){
+      window.location.href = 'student_dashboard.html';
+    } else if(email==='dharineeshv18@gmail.com') {
+       window.location.href = 'admin_dashboard.html';
+    }
+    else{
+     window.location.href = 'teacher_dashboard.html';
+    }
+
+  
+};
+
+   function parseJwt(token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: '260816760106-ac3ldjbtf9n032k98p871u5kprhpq8lt.apps.googleusercontent.com', // replace with your client ID
+      callback: handleCredentialResponse,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signin'),
+      {
+        theme: 'outline',
+        size: 'large',
+        type: 'standard',
+        shape: 'rectangular',
+        logo_alignment: 'left',
+      } 
+    );
+
+    };
+</script>
+
