@@ -3,44 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Slot Details</title>
+    <script src="https://kit.fontawesome.com/6045d1d2eb.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
     <div class="nav-container">
+        <i class="fa-solid fa-arrow-left"></i>
         <h3>Slot Details</h3>
     </div>
-    <div class=details>
 
+    <div class="details-card">
+       
+
+        <div class="details">
+          
+
+        </div>
+            
+        
     </div>
+
 </body>
 </html>
-<style>
-*
-{
-    padding:0;
-    margin:0;
-    box-sizing: border-box;
-}
-body {
-     
-        padding: 0px;
-        background: #f7f9fc;
-        font-family: 'Poppins', sans-serif;
-        
-    }
 
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body {
+  background:#f7f9fc;
+  font-family:'Poppins', sans-serif;
+  padding:20px;
+}
+
+/* Top Nav */
 .nav-container {
-    display:flex;
-    justify-content: center;
-    padding: 15px;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:15px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom:20px;
+}
+
+.nav-container i {
+  font-size:20px;
+  cursor:pointer;
+}
+
+/* Card */
+.details-card {
+  width:100%;
+  background:#fff;
+  padding:12px;
+  border-radius:15px;
+  display:flex;
+  gap:2px;
+  align-items:center;
+  box-shadow:0 4px 8px rgba(0,0,0,0.07);
+}
+
+/* Left Icon */
+.profile-icon {
+  width:60px;
+  height:60px;
+  background:#e0e7ff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  color:#4f46e5;
+}
+
+/* Right Details */
+.details {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.inner-detail {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.inner-detail h4 {
+  width: 110px; /* Increased width for perfect alignment */
+  text-align: right; /* Makes it look clean */
+  font-weight: 600;
+}
+
+.inner-detail p {
+  font-size: 15px;
+  margin-left: 10px;
 }
 
 </style>
-<script>
-   let data =  sessionStorage.getItem('view_datas');
-   let datas = JSON.parse(data);
-   console.log(datas);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
+const appSetting = {
+  databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
+};
+const app = initializeApp(appSetting);
+const database = getDatabase(app);
+
+const student_otp_db = ref(database, "Bookings");
+
+// Read session storage
+let stored = sessionStorage.getItem("view_datas");
+let datas = JSON.parse(stored);
+console.log(datas);
+
+// MAIN LOGIC
+onValue(student_otp_db, (snapshot) => {
+    if (!snapshot.exists()) {
+        console.log("No data found");
+        return;
+    }
+
+    const detailsDiv = document.querySelector(".details");
+    detailsDiv.innerHTML = ""; // RESET so duplicates won't appear
+
+    let found = false;
+
+    const dbData = snapshot.val();
+
+    for (let key in dbData) {
+        let slot = dbData[key];
+
+        if (
+            slot.venue === datas.venue_name &&
+            slot.date === datas.date &&
+            slot.start_time === datas.time
+        ) {
+            found = true;
+
+            // Create profile icon once for each user
+            let icon = document.createElement("div");
+            icon.classList.add("profile-icon");
+            icon.innerHTML = `<i class="fa-regular fa-user"></i>`;
+            document.querySelector(".details-card").prepend(icon);
+
+            // ------------------
+            // NAME FIELD
+            // ------------------
+            let div1 = document.createElement("div");
+            div1.classList.add("inner-detail");
+            div1.innerHTML = `
+                <h4>Name:</h4>
+                <p>${slot.student_name || "Unknown"}</p>
+            `;
+            detailsDiv.append(div1);
+
+            // ------------------
+            // EMAIL FIELD
+            // ------------------
+            let div2 = document.createElement("div");
+            div2.classList.add("inner-detail");
+            div2.innerHTML = `
+                <h4>Email:</h4>
+                <p>${slot.student_email}</p>
+            `;
+            detailsDiv.append(div2);
+
+            // ------------------
+            // VENUE FIELD
+            // ------------------
+            let div3 = document.createElement("div");
+            div3.classList.add("inner-detail");
+            div3.innerHTML = `
+                <h4>Venue:</h4>
+                <p>${slot.venue}</p>
+            `;
+            detailsDiv.append(div3);
+        }
+    }
+
+    if (!found) {
+        console.log("No matching slot found.");
+    }
+});
 </script>
