@@ -96,6 +96,13 @@ body {
   gap: 15px;
   align-items: center;
 }
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 10px 0;
+  width: 80%; /* to align with slot cards width */
+}
+
 
 .inner-detail h4 {
   width: 110px; /* Increased width for perfect alignment */
@@ -206,6 +213,10 @@ for (let key in dbData) {
 
         slotCard.appendChild(detailsContainer);
         detailsDiv.appendChild(slotCard);
+
+        let hr = document.createElement("hr");
+detailsDiv.appendChild(hr);
+
     }
 }
 
