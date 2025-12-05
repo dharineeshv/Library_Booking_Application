@@ -138,6 +138,14 @@
   button:hover {
     background-color: #0052cc;
   }
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  button:disabled:hover {
+    background-color: #cccccc;
+  }
 
   /* POPUP */
   .popup {
@@ -222,14 +230,37 @@ if (selectedSlot) {
     `;
 }
 
-// Check if student has booking for today
+// Check if student has booking for today (any venue)
 get(student_booking_db).then(snapshot => {
     const email = sessionStorage.getItem("userEmail");
 
     if (snapshot.exists()) {
         let data = snapshot.val();
-        let found = false;
+        let hasBookingToday = false;
+        let existingBooking = null;
 
+        // Check if student has ANY booking for this date (regardless of venue)
+        for (let key in data) {
+            if (
+                data[key].student_email === email &&
+                data[key].date === slotData.date &&
+                data[key].isBookedToday === true
+            ) {
+                hasBookingToday = true;
+                existingBooking = data[key];
+                break;
+            }
+        }
+
+        // If student already has a booking for today, disable button and show status
+        if (hasBookingToday) {
+            disableBookingButton();
+            confirmed();
+            return;
+        }
+
+        // Check if there's a pending booking for this specific venue and date
+        let found = false;
         for (let key in data) {
             if (
                 data[key].student_email === email &&
@@ -237,11 +268,7 @@ get(student_booking_db).then(snapshot => {
                 data[key].venue === slotData.venue
             ) {
                 found = true;
-
-                if (data[key].isBookedToday === true) {
-                    confirmed();
-                    return;
-                } else {
+                if (data[key].isBookedToday === false) {
                     addBookingButtonListener(key);
                     return;
                 }
@@ -264,19 +291,68 @@ get(student_booking_db).then(snapshot => {
                 addBookingButtonListener();
             });
         }
+    } else {
+        // No bookings exist, allow booking
+        const email = sessionStorage.getItem("userEmail");
+        let gen_id = Math.floor(100000 + Math.random() * 900000);
+        push(student_booking_db, {
+            student_email: email,
+            isBookedToday: false,
+            date: slotData.date,
+            approval_status: "Pending",
+            student_id: gen_id,
+            venue: slotData.venue,
+            start_time: slotData.start_time,
+            end_time: slotData.end_time
+        }).then(() => {
+            addBookingButtonListener();
+        });
     }
 });
 
+// Disable booking button
+function disableBookingButton() {
+    const button = document.querySelector("button");
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Already Booked for Today";
+    }
+}
+
 // Add event listener to booking button
 function addBookingButtonListener(bookingKey) {
-    document.querySelector("button").addEventListener("click", () => {
-        
-        // Mark booking as confirmed
+    const button = document.querySelector("button");
+    if (!button) return;
+    
+    // Remove any existing listeners to prevent duplicates
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    newButton.addEventListener("click", () => {
+        // Double-check that student doesn't have a booking for today
         get(student_booking_db).then(snapshot => {
             if (snapshot.exists()) {
                 let data = snapshot.val();
                 const email = sessionStorage.getItem("userEmail");
-
+                
+                // Check if student already has a booking for today
+                let hasBookingToday = false;
+                for (let key in data) {
+                    if (
+                        data[key].student_email === email &&
+                        data[key].date === slotData.date &&
+                        data[key].isBookedToday === true
+                    ) {
+                        hasBookingToday = true;
+                        disableBookingButton();
+                        confirmed();
+                        return;
+                    }
+                }
+                
+                if (hasBookingToday) return;
+                
+                // Find the booking key
                 for (let key in data) {
                     if (
                         data[key].student_email === email &&
@@ -300,6 +376,7 @@ function addBookingButtonListener(bookingKey) {
 
                 booking_confirmed = true;
                 showPopup();
+                disableBookingButton();
                 confirmed();
             }
         });
@@ -319,7 +396,8 @@ function showPopup() {
 
 // Confirmed UI
 async function confirmed() {
-    document.querySelector(".button").style.display = "none";
+    // Disable button instead of hiding it
+    disableBookingButton();
 
     let email = sessionStorage.getItem("userEmail");
     let name = email.split("@")[0];
@@ -338,12 +416,12 @@ async function confirmed() {
     if (snapshot.exists()) {
         let data = snapshot.val();
 
+        // Find the booking for today (any venue)
         for (let key in data) {
             if (
                 data[key].student_email === email &&
                 data[key].isBookedToday === true &&
-                data[key].date === slotData.date &&
-                data[key].venue === slotData.venue
+                data[key].date === slotData.date
             ) {
                 booked_status.innerHTML += `
                     <div class="a"><h4>Venue</h4><p>${data[key].venue}</p></div>
@@ -352,6 +430,7 @@ async function confirmed() {
                     <div class="a"><h4>Student ID</h4><p>${data[key].student_id}</p></div>
                     <div class="a"><h4>Status</h4><p>${data[key].approval_status}</p></div>
                 `;
+                break; // Only show the first booking found for today
             }
         }
     }
