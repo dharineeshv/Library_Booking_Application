@@ -214,7 +214,11 @@ onValue(student_booking_db, (snapshot) => {
         let data = snapshot.val();
 
         for(let key in data) {
-            if(name.venue === data[key].venue && name.date === data[key].date) {
+           if (
+    name.venue === data[key].venue &&
+    name.date === data[key].date &&
+    (data[key].approval_status === "Pending" || data[key].approval_status === "pending")
+) {
                 
                 found = true;
                 let student_id = data[key].student_id;
