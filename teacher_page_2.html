@@ -165,6 +165,21 @@ button {
 .toast-error {
   background-color: #cc0000 !important;
 }
+.verify .reject {
+    background-color: #d32f2f; /* Bright Red */
+}
+
+.verify .verify-btn {
+    background-color: #0066ff; /* Bright Blue */
+}
+
+.verify .reject:hover {
+    background-color: #b22626;
+}
+
+.verify .verify-btn:hover {
+    background-color: #0050c7;
+}
 
 
 </style>
@@ -173,40 +188,39 @@ button {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getDatabase, ref, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
-        const appSetting = {
-        databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
-        };
-        const app = initializeApp(appSetting);
-        const database = getDatabase(app);
-        const student_booking_db = ref(database, "Bookings");
+const appSetting = {
+    databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
+};
+const app = initializeApp(appSetting);
+const database = getDatabase(app);
+const student_booking_db = ref(database, "Bookings");
 
+let arrow_back = document.querySelector('#left');
+arrow_back.addEventListener('click', () => {
+    window.location.href = "teacher_dashboard.html";
+});
 
-        let arrow_back = document.querySelector('#left')
-        arrow_back.addEventListener('click',()=>
-        {
-            window.location.href = "teacher_dashboard.html"
-        })
-    let slot = sessionStorage.getItem('selectedSlot');
-    let name =  JSON.parse(slot)
-    console.log(name);
+let slot = sessionStorage.getItem('selectedSlot');
+let name = JSON.parse(slot);
+console.log(name);
 
-    onValue(student_booking_db, (snapshot) => {
+onValue(student_booking_db, (snapshot) => {
     const datasContainer = document.querySelector('.datas');
-    datasContainer.innerHTML = ""; // Clear previous content
+    datasContainer.innerHTML = "";
+
+    let found = false;
 
     if(snapshot.exists()) {
         let data = snapshot.val();
-        let found = false;
 
         for(let key in data) {
             if(name.venue === data[key].venue && name.date === data[key].date) {
+                
                 found = true;
-
                 let student_id = data[key].student_id;
                 let venue = data[key].venue;
                 let date = data[key].date;
 
-                // Create new card for each student
                 let card = document.createElement('div');
                 card.classList.add('booking-card');
                 card.innerHTML = `
@@ -221,39 +235,51 @@ import { getDatabase, ref, onValue, remove, get, update } from "https://www.gsta
                         <button id="verify-${key}" class="verify-btn">Verify</button>
                     </div>
                 `;
-                let datas = document.querySelector('.datas');
-                datas.style.display = "flex";
 
                 datasContainer.appendChild(card);
-            
-           
+                datasContainer.style.display = "flex";
 
-    document.getElementById(`verify-${key}`).addEventListener("click", () => {
-    update(ref(database, "Bookings/" + key), {
-        approval_status: "Approved"
-    });
-    document.getElementById(`verify-${key}`).textContent = "Approved ✔️";
-    document.getElementById(`verify-${key}`).disabled = true;
-    document.getElementById(`reject-${key}`).disabled = true;
-    updateUI();
-    showToast("Approved Successfully!", "success");
+                // Approve button event
+                document.getElementById(`verify-${key}`).addEventListener("click", () => {
+                    update(ref(database, "Bookings/" + key), {
+                        approval_status: "Approved"
+                    });
+
+                    showToast("Approved Successfully!", "success");
+                    document.getElementById(`verify-${key}`).textContent = "Approved ✔️";
+                    document.getElementById(`verify-${key}`).style.backgroundColor = "#007b1e";
+                    document.getElementById(`reject-${key}`).style.display = "none";
+
+                    updateUI();
+                });
+
+                // Reject button event
+                document.getElementById(`reject-${key}`).addEventListener("click", () => {
+                    remove(ref(database, "Bookings/" + key));
+                    card.remove();
+
+                    const slotRef = ref(database, "Slots/" + name.slot_key);
+                    get(slotRef).then((snapshot) => {
+                        if (snapshot.exists()) {
+                            let slotData = snapshot.val();
+                            let updatedBooked = slotData.booked_slots - 1;
+                            if (updatedBooked < 0) updatedBooked = 0;
+                            update(slotRef, { booked_slots: updatedBooked });
+                        }
+                    });
+
+                    showToast("Booking Rejected!", "error");
+                    updateUI();
+                });
+            }
+        }
+    }
+
+    document.querySelector('.no-datas').style.display = found ? "none" : "flex";
 });
 
 
-      document.getElementById(`reject-${key}`).addEventListener("click", () => {
-    remove(ref(database, "Bookings/" + key));  // delete booking record
-    card.remove(); // Remove card from UI
-    updateUI();
-    showToast("Booking Rejected!", "Declined");
-
-      });
-    }
-}
-        
-        document.querySelector('.no-datas').style.display = found ? "none" : "flex";
-    }
-    
-});
+// Toast Function
 function showToast(message, type) {
     const toast = document.getElementById("toast");
     toast.textContent = message;
@@ -264,8 +290,7 @@ function showToast(message, type) {
     }, 3000);
 }
 
-
-
+// UI update function
 function updateUI() {
     const datasContainer = document.querySelector(".datas");
     const noDatasContainer = document.querySelector(".no-datas");
@@ -278,8 +303,5 @@ function updateUI() {
         datasContainer.style.display = "flex";
     }
 }
-
-
-
 
 </script>
