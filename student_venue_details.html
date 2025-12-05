@@ -226,8 +226,23 @@ if (selectedSlot) {
     document.querySelector(".container-2").innerHTML = `
         <div class="date"><h4>Date</h4><p>${slotData.date}</p></div>
         <div class="time"><h4>Time</h4><p>${slotData.start_time} - ${slotData.end_time}</p></div>
-        <div class="seats"><h4>Seats Available</h4><p>${slotData.total_slots - slotData.booked_slots} Seats</p></div>
+        <div class="seats"><h4>Seats Available</h4><p id="seats-available-text">${slotData.total_slots - slotData.booked_slots} Seats</p></div>
     `;
+
+    // keep seats available in sync with realtime DB
+    if (slotData.slot_key) {
+        onValue(ref(database, "Slots/" + slotData.slot_key), snap => {
+            if (snap.exists()) {
+                const slot = snap.val();
+                slotData.booked_slots = slot.booked_slots;
+                slotData.total_slots = slot.total_slots;
+                const seatsText = document.getElementById("seats-available-text");
+                if (seatsText) {
+                    seatsText.textContent = `${slot.total_slots - slot.booked_slots} Seats`;
+                }
+            }
+        });
+    }
 }
 
 // Check if student has booking for today (any venue)
@@ -369,9 +384,14 @@ function addBookingButtonListener(bookingKey) {
                     isBookedToday: true
                 });
 
-                // Update seat count in Slots table
-                update(ref(database, "Slots/" + slotData.slot_key), {
-                    booked_slots: slotData.booked_slots + 1
+                // Update seat count in Slots table (use latest value from DB)
+                const slotRef = ref(database, "Slots/" + slotData.slot_key);
+                get(slotRef).then(latestSnap => {
+                    const currentBooked = latestSnap.exists() ? latestSnap.val().booked_slots : slotData.booked_slots;
+                    const newBooked = currentBooked + 1;
+                    update(slotRef, {
+                        booked_slots: newBooked
+                    });
                 });
 
                 booking_confirmed = true;
