@@ -354,6 +354,23 @@ function loadSlotsForDate(date) {
           let percent = (slot.booked_slots / slot.total_slots) * 100;
           let fill = card.querySelector(".bar-fill");
           fill.style.width = percent + "%";
+
+          // Add delete button functionality
+          let deleteBtn = card.querySelector(".delete-btn");
+          deleteBtn.addEventListener("click", () => {
+            if (confirm(`Are you sure you want to delete the slot for ${slot.venue} on ${slot.date}?`)) {
+              const slotRef = ref(database, "Slots/" + key);
+              remove(slotRef)
+                .then(() => {
+                  console.log("Slot deleted successfully");
+                  // The real-time listener will automatically update the UI
+                })
+                .catch((error) => {
+                  console.error("Error deleting slot:", error);
+                  alert("Failed to delete slot. Please try again.");
+                });
+            }
+          });
         }
       }
     }
