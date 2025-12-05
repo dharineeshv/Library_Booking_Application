@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/6045d1d2eb.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="nav-container">
+        <i class="fa-solid fa-arrow-left" id="left"></i>
+        <h3>Verification Queue</h3>
+    </div>
+
+    <div class="no-datas">
+        <i class="fa-regular fa-circle-check"></i>
+        <h3>All Caught Up!</h3>
+        <p>There Are no new Student bookings that require your verification at this time</p>
+    </div>
+
+
+    <div class="datas">
+       
+    </div>
+    <div id="toast"></div>
+
+</body>
+</html>
+<style>
+    
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+  *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Poppins", Arial, sans-serif;
+    background: #f7f9fc;
+    color: #222;
+  }
+  .nav-container {
+    display:flex;
+    gap:40%;
+    padding:10px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+.verify {
+  margin-left: auto; 
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+}
+button {
+    padding:8px;
+    border:none;
+    color:white;
+    border-radius: 6px;
+    font-weight: 600;
+}
+#reject {
+    background-color: rgba(255, 0, 0, 0.838);
+}
+#verify {
+    background-color: rgba(0, 72, 255, 0.866);
+}
+#reject:hover {
+    background-color: rgba(255, 0, 0, 0.641);
+    cursor: pointer;
+}
+#verify:hover {
+    background-color: rgba(0, 72, 255, 0.685);
+    cursor: pointer;
+}
+
+  .fa-solid.fa-arrow-left
+  {
+       cursor: pointer;
+       margin-top: 5px;
+  }
+  .fa-regular.fa-user
+  {
+    font-size: 1.6em;
+    align-content: center;
+    margin:10px;
+
+  }
+  p{
+    font-size: 12px;
+    font-weight: 600px;
+    color:#22222291;
+
+  }
+  .no-datas {
+    display:none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top:20px;
+    gap:10px;
+    
+  }
+  .fa-regular.fa-circle-check
+  {
+    font-size: 2.6em;
+  }
+  .datas {
+    display:none;
+    flex-direction: row;
+    padding:10px;
+    gap:10px;
+    margin:10px;
+    border-radius: 10px;
+     background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    
+  }
+  .inner-content{
+    display:flex;
+    flex-direction: column;
+    
+  }
+  .booking-card {
+    width: 100%;
+    background: #fff;
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    margin: 10px;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 18px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  z-index: 9999;
+}
+
+#toast.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.toast-success {
+  background-color: #007b1e !important;
+}
+
+.toast-error {
+  background-color: #cc0000 !important;
+}
+
+
+</style>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getDatabase, ref, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const appSetting = {
+        databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
+        };
+        const app = initializeApp(appSetting);
+        const database = getDatabase(app);
+        const student_booking_db = ref(database, "Bookings");
+
+
+        let arrow_back = document.querySelector('#left')
+        arrow_back.addEventListener('click',()=>
+        {
+            window.location.href = "teacher_dashboard.html"
+        })
+    let slot = sessionStorage.getItem('selectedSlot');
+    let name =  JSON.parse(slot)
+    console.log(name);
+
+    onValue(student_booking_db, (snapshot) => {
+    const datasContainer = document.querySelector('.datas');
+    datasContainer.innerHTML = ""; // Clear previous content
+
+    if(snapshot.exists()) {
+        let data = snapshot.val();
+        let found = false;
+
+        for(let key in data) {
+            if(name.venue === data[key].venue && name.date === data[key].date) {
+                found = true;
+
+                let student_id = data[key].student_id;
+                let venue = data[key].venue;
+                let date = data[key].date;
+
+                // Create new card for each student
+                let card = document.createElement('div');
+                card.classList.add('booking-card');
+                card.innerHTML = `
+                    <i class="fa-regular fa-user"></i>
+                    <div class="inner-content">
+                        <h4>Student ID: <span>${student_id}</span></h4>
+                        <p>Venue <span>${venue}</span></p>
+                        <p>Date <span>${date}</span></p>
+                    </div>
+                    <div class="verify">
+                        <button id="reject-${key}" class="reject">Reject</button>
+                        <button id="verify-${key}" class="verify-btn">Verify</button>
+                    </div>
+                `;
+                let datas = document.querySelector('.datas');
+                datas.style.display = "flex";
+
+                datasContainer.appendChild(card);
+            
+           
+
+    document.getElementById(`verify-${key}`).addEventListener("click", () => {
+    update(ref(database, "Bookings/" + key), {
+        approval_status: "Approved"
+    });
+    document.getElementById(`verify-${key}`).textContent = "Approved ✔️";
+    document.getElementById(`verify-${key}`).disabled = true;
+    document.getElementById(`reject-${key}`).disabled = true;
+    updateUI();
+    showToast("Approved Successfully!", "success");
+});
+
+
+      document.getElementById(`reject-${key}`).addEventListener("click", () => {
+    remove(ref(database, "Bookings/" + key));  // delete booking record
+    card.remove(); // Remove card from UI
+    updateUI();
+    showToast("Booking Rejected!", "Declined");
+
+      });
+    }
+}
+        
+        document.querySelector('.no-datas').style.display = found ? "none" : "flex";
+    }
+    
+});
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "show " + (type === "success" ? "toast-success" : "toast-error");
+
+    setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+    }, 3000);
+}
+
+
+
+function updateUI() {
+    const datasContainer = document.querySelector(".datas");
+    const noDatasContainer = document.querySelector(".no-datas");
+
+    if (datasContainer.children.length === 0) {
+        noDatasContainer.style.display = "flex";
+        datasContainer.style.display = "none";
+    } else {
+        noDatasContainer.style.display = "none";
+        datasContainer.style.display = "flex";
+    }
+}
+
+
+
+
+</script>
