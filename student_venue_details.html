@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -234,20 +235,35 @@ if (selectedSlot) {
         <div class="seats"><h4>Seats Available</h4><p id="seats-available-text">${slotData.total_slots - slotData.booked_slots} Seats</p></div>
     `;
 
-    // keep seats available in sync with realtime DB
-    if (slotData.slot_key) {
-        onValue(ref(database, "Slots/" + slotData.slot_key), snap => {
-            if (snap.exists()) {
-                const slot = snap.val();
-                slotData.booked_slots = slot.booked_slots;
-                slotData.total_slots = slot.total_slots;
-                const seatsText = document.getElementById("seats-available-text");
-                if (seatsText) {
-                    seatsText.textContent = `${slot.total_slots - slot.booked_slots} Seats`;
-                }
-            }
-        });
-    }
+ if (slotData.slot_key) {
+    const slotRef = ref(database, "Slots/" + slotData.slot_key);
+    
+    onValue(slotRef, snap => {
+        if (!snap.exists()) return;
+
+        const slot = snap.val();
+        slotData.booked_slots = slot.booked_slots;
+        slotData.total_slots = slot.total_slots;
+
+        const availableSeats = slot.total_slots - slot.booked_slots;
+        const seatsText = document.getElementById("seats-available-text");
+
+        if (seatsText) {
+            seatsText.textContent = `${availableSeats} Seats`;
+        }
+
+        const confirmBtn = document.querySelector("button");
+        const btnContainer = document.querySelector(".button");
+        btnContainer.style.visibility = "visible";
+
+        // If seats are full → disable button
+        if (availableSeats <= 0) {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "No Slots Available";
+        }
+    });
+}
+
 }
 
 // Check if student has booking for today (any venue)
