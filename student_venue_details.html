@@ -419,12 +419,13 @@ async function confirmed() {
     // Disable button instead of hiding it
     disableBookingButton();
 
- let email = sessionStorage.getItem("userEmail");
+let email = sessionStorage.getItem("userEmail");
 
-let name = email
-    .split("@")[0]          // get part before @
-    .replace(/[^a-zA-Z]/g, "") // remove everything except letters
-    .toUpperCase();            // convert to uppercase
+let namePart = email.split("@")[0];
+
+// extract only the FIRST continuous alphabet sequence
+let name = namePart.match(/^[A-Za-z]+/)[0].toUpperCase();
+
 
 
 
@@ -464,4 +465,5 @@ let name = email
     }
 }
 </script>
+
 
