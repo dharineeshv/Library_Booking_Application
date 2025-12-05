@@ -37,6 +37,11 @@
     
      </div>
      
+<div id="popup" class="popup">
+    <i class="fa-solid fa-circle-check"></i>
+    <p>Slot Added Successfully!</p>
+</div>
+
 </body>
 </html>
 <style>
@@ -112,6 +117,41 @@
         flex-direction: column;
         padding:15px;
     }
+    /* POPUP */
+.popup {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0066ffb3;
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05em;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 9999;
+}
+
+.popup.show {
+  bottom: 30px;
+  opacity: 1;
+}
+
+.popup.hide {
+  opacity: 0;
+  bottom: -100px;
+}
+.popup i {
+  font-size: 1.4em;
+  color: #ffffff;
+}
+
 </style>
 <script>
     document.querySelector('.fa-arrow-left').addEventListener('click', function() {
@@ -199,10 +239,24 @@ let btn = document.querySelector('button');
         
     }
 
-    push(student_otp_db, datas);
-     alert('New Slot Added Successfully!');
-     window.location.href = 'admin_dashboard.html';
+   push(student_otp_db, slotData).then(() => {
+    showPopup(); //🎉 replaces alert
+  });
     
   }
   });
+    function showPopup() {
+  const popup = document.getElementById("popup");
+  popup.classList.add("show");
+
+  setTimeout(() => {
+    popup.classList.remove("show");
+    popup.classList.add("hide");
+  }, 2000);
+
+  setTimeout(() => {
+    window.location.href = "admin_dashboard.html";
+  }, 2400);
+}
+
 </script>
