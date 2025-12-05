@@ -129,17 +129,12 @@
     display: block;
   }
   .button {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  background: transparent;
-  padding: 10px;
-}
-
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-top: 45vh;
+  }
   button:hover {
     background-color: #0052cc;
   }
@@ -426,6 +421,7 @@ async function confirmed() {
 
     let email = sessionStorage.getItem("userEmail");
     let name = email.split("@")[0];
+    console.log(name);
 
     let booked_status = document.querySelector(".booked-status");
     booked_status.innerHTML = "";
@@ -434,6 +430,7 @@ async function confirmed() {
     booked_status.innerHTML += `
         <div class="a"><h4>Name</h4><p>${name}</p></div>
         <div class="a"><h4>Email</h4><p>${email}</p></div>
+        
     `;
 
     const snapshot = await get(student_booking_db);
@@ -461,4 +458,3 @@ async function confirmed() {
     }
 }
 </script>
-
