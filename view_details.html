@@ -183,9 +183,12 @@ onValue(student_otp_db, (snapshot) => {
 
             let details = document.createElement("div");
             details.classList.add("details");
+            let email = slot.student_email;
+       let username = email.split("@")[0].split(".")[0].toUpperCase();
+
 
             const fields = [
-                { label: "Name:", value: slot.student_name || "Unknown" },
+                { label: "Name:", value: username || "Unknown" },
                 { label: "Email:", value: slot.student_email },
                 { label: "Venue:", value: slot.venue }
             ];
