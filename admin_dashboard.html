@@ -312,9 +312,9 @@ function loadSlotsForDate(date) {
   selectedDate = date;
   let slotList = document.getElementById("slotList");
   slotList.innerHTML = "";
-  let found = false;
 
   onValue(student_otp_db, function (snapshot) {
+    let found = false;
     if (snapshot.exists()) {
       let data = snapshot.val();
       for (let key in data) {
@@ -365,7 +365,7 @@ function loadSlotsForDate(date) {
       document.querySelector('.no-datas').style.display = 'flex';
       slotList.style.display = 'none';
     }
-  }, { onlyOnce: true });
+  });
 }
 
 // Initial load
