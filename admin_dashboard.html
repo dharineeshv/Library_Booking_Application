@@ -371,6 +371,18 @@ function loadSlotsForDate(date) {
                 });
             }
           });
+          let viewBtn = card.querySelector(".view-btn");
+viewBtn.addEventListener("click", () => {
+
+  let view_datas = {
+    venue_name: slot.venue,
+    date: slot.date,
+    time: slot.start_time
+  };
+
+  sessionStorage.setItem("view_datas", JSON.stringify(view_datas));
+  window.location.href = "view_details.html";
+});
         }
       }
     }
@@ -384,18 +396,7 @@ function loadSlotsForDate(date) {
     }
 
 
-let viewBtn = card.querySelector(".view-btn");
-viewBtn.addEventListener("click", () => {
 
-  let view_datas = {
-    venue_name: slot.venue,
-    date: slot.date,
-    time: slot.start_time
-  };
-
-  sessionStorage.setItem("view_datas", JSON.stringify(view_datas));
-  window.location.href = "view_details.html";
-});
 
   });
 
