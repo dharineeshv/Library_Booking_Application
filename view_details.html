@@ -40,7 +40,7 @@ body {
 </style>
 <script>
    let data =  sessionStorage.getItem('view_datas');
-   let datas = data.parse(data);
+   let datas = JSON.parse(data);
    console.log(datas);
-   
+
 </script>
