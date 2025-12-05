@@ -133,7 +133,7 @@
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getDatabase, ref, onValue, remove, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, onValue, remove, get, off } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const appSetting = {
         databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
@@ -206,6 +206,8 @@
 
     let day_name = now.toLocaleString('en-US', { weekday: 'short' });
 
+let unsubscribeSlots = null;
+
 async function loadSlotsForDate(date) {
     const slot = document.querySelector('.slots');
     slot.innerHTML = ""; // clear slots before loop
@@ -214,69 +216,72 @@ async function loadSlotsForDate(date) {
     const no_datas = document.querySelector('.no-datas');
     no_datas.style.display = 'none';
 
+    // detach previous realtime listener, if any
+    if (typeof unsubscribeSlots === 'function') {
+        unsubscribeSlots();
+    }
+
     try {
-        const snapshot = await get(student_otp_db);
-        if (snapshot.exists()) {
-            const data = snapshot.val();
+        // listen in realtime so seat counts update for every student
+        unsubscribeSlots = onValue(student_otp_db, (snapshot) => {
+            slot.innerHTML = "";
             let foundSlots = false;
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // Format the date nicely for display
+                const displayDateStr = formatDisplayDate(date);
 
-            // Format the date nicely for display
-            const displayDateStr = formatDisplayDate(date);
+                for (let key in data) {
+                    if (data[key].date === date) {
+                        foundSlots = true;
 
-            for (let key in data) {
-                if (data[key].date === date) {
-                    foundSlots = true;
+                        let cap_info = document.createElement('div');
+                        cap_info.classList.add('cap-info');
+                        cap_info.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
 
-                    let cap_info = document.createElement('div');
-                    cap_info.classList.add('cap-info');
-                    cap_info.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
+                        let inner_contents = document.createElement('div');
+                        inner_contents.classList.add('inner-contents');
+                        inner_contents.innerHTML = `
+                            <h3 id="venue-name">${data[key].venue}</h3>
+                            <p id="c">${displayDateStr} ${data[key].start_time} - ${data[key].end_time}</p>
+                        `;
 
-                    let inner_contents = document.createElement('div');
-                    inner_contents.classList.add('inner-contents');
-                    inner_contents.innerHTML = `
-                        <h3 id="venue-name">${data[key].venue}</h3>
-                        <p id="c">${displayDateStr} ${data[key].start_time} - ${data[key].end_time}</p>
-                    `;
+                        cap_info.appendChild(inner_contents);
 
-                    cap_info.appendChild(inner_contents);
+                        let arrow = document.createElement('div');
+                        arrow.classList.add('arrow');
+                        arrow.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
+                       
+                        arrow.addEventListener('click', () => {
+                            // Prepare an object with the latest slot data
+                            const slotData = {
+                                slot_key: key,
+                                venue: data[key].venue,
+                                date: date, // the date you loaded slots for
+                                start_time: data[key].start_time,
+                                end_time: data[key].end_time,
+                                total_slots: data[key].total_slots,
+                                booked_slots: data[key].booked_slots,
+                            };
+                            sessionStorage.setItem('selectedSlot', JSON.stringify(slotData));
 
-                    let arrow = document.createElement('div');
-                    arrow.classList.add('arrow');
-                    arrow.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
-                   
-                    arrow.addEventListener('click', () => {
-    // Prepare an object with the slot data you want to store
-    const slotData = {
-        venue: data[key].venue,
-        date: date, // the date you loaded slots for
-        start_time: data[key].start_time,
-        end_time: data[key].end_time,
-        total_slots: data[key].total_slots,
-        booked_slots: data[key].booked_slots,
-        // add more fields if needed
-    };
-    sessionStorage.setItem('selectedSlot', JSON.stringify(slotData));
+                            // Redirect to next page or perform any action
+                            window.location.href = "student_venue_details.html";
+                        });
 
-    // Redirect to next page or perform any action
-    window.location.href = "student_venue_details.html";
+                        cap_info.appendChild(arrow);
 
-});
+                        slot.appendChild(cap_info);
 
+                        let span_element = document.createElement('span');
+                        span_element.id = 'a';
+                        slot.appendChild(span_element);
 
-                    cap_info.appendChild(arrow);
-
-                    slot.appendChild(cap_info);
-
-                    let span_element = document.createElement('span');
-                    span_element.id = 'a';
-                    slot.appendChild(span_element);
-
-                    let p_element = document.createElement('p');
-                    p_element.id = 'b';
-                    p_element.innerHTML = `<span id="available">${data[key].total_slots - data[key].booked_slots}</span> Seats Available`;
-                    slot.appendChild(p_element);
-
-
+                        let p_element = document.createElement('p');
+                        p_element.id = 'b';
+                        p_element.innerHTML = `<span id="available">${data[key].total_slots - data[key].booked_slots}</span> Seats Available`;
+                        slot.appendChild(p_element);
+                    }
                 }
             }
 
@@ -287,10 +292,7 @@ async function loadSlotsForDate(date) {
                 slot.style.display = 'none';
                 no_datas.style.display = 'flex';
             }
-        } else {
-            slot.style.display = 'none';
-            no_datas.style.display = 'flex';
-        }
+        });
     } catch (error) {
         console.error("Error loading slots:", error);
         slot.style.display = 'none';
