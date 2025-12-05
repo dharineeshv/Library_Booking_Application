@@ -9,7 +9,7 @@
 
 <body>
     <div class="nav-container">
-        <i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-arrow-left" id="left-arrow"></i>
         <h3>Slot Details</h3>
     </div>
 
@@ -209,5 +209,10 @@ onValue(student_otp_db, (snapshot) => {
         alert("No matching slot found.");
     }
 });
+    let back = document.querySelector('#left-arrow');
+back.addEventListener('click',()=>
+{
+    window.location.href = "admin_dashboard.html";
+})
 
 </script>
