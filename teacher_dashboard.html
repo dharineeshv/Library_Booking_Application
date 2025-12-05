@@ -3,9 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Teacher_Dashboard</title>
+    <script src="https://kit.fontawesome.com/6045d1d2eb.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="nav-container">
+        <h3>Teacher Dashboard</h3>
+         <i class="fa-regular fa-calendar calendar-btn" id="calender"></i>
+         <input type="date" id="datePicker" style="visibility: hidden; position: absolute;">
+    </div>
+
+
+    <div class="no-datas">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <h3>No Available Slots Today!</h3>
+        <p>Try adjusting your date to find other options.</p>
+    </div>
+
+
+    <div class="slots">
     
+    </div>
 </body>
 </html>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Poppins", Arial, sans-serif;
+    background: #f7f9fc;
+    color: #222;
+  }
+   .slots {
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+        gap: 15px;
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .cap-info {
+        display: flex;
+        align-items: center;
+        gap:15px; 
+        
+    }
+    .cap-info i, .arrow i {
+    font-size: 24px !important;
+    display: inline-block;
+}
+
+
+    #a {
+        border: 0.5px solid rgba(0, 0, 0, 0.333);
+        width: 100%;
+    }
+    #b {
+        font-weight: 500;
+        color: rgba(0, 128, 0, 0.874);
+        font-size: 0.8em;
+    }
+    #c {
+        font-size: 0.8em;
+        color: #646262;
+    }
+    .arrow {
+        margin-left: auto;
+        color: #646262;
+    }
+  .nav-container {
+    display:flex;
+   
+    justify-content: space-around;
+     background: #ffffff;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        padding:10px;
+  }
+    .fa-solid.fa-graduation-cap
+    {
+        font-size: 30px; 
+        color:rgb(0, 153, 255);
+    }
+  #calender {
+    margin-top:5px;
+  }
+
+      .no-datas {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 20px;
+        margin: 25px;
+        border-radius: 10px;
+        color: #333;
+    }
+
+    .no-datas i {
+        font-size: 50px;
+        padding: 6px;
+        border-radius: 120px;
+        background: #6666662e;
+    }
+</style>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, get, off } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const appSetting = {
+        databaseURL: "https://library-slot-booking-8ef25-default-rtdb.firebaseio.com/",
+        };
+        const app = initializeApp(appSetting);
+        const database = getDatabase(app);
+        const student_otp_db = ref(database, "Slots");
+
+ let selectedDate = "";
+    let date = new Date();
+    let day = String(date.getDate()).padStart(2, '0');
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let year = date.getFullYear();
+    selectedDate = year + '-' + month + '-' + day;
+
+
+document.querySelector('.calendar-btn').addEventListener('click', () => {
+    document.getElementById('datePicker').showPicker();
+});
+
+
+datePicker.addEventListener('change', () => {
+  selectedDate = datePicker.value;
+  loadSlotsForDate(selectedDate);
+});
+
+
+    
+let unsubscribeSlots = null;
+
+async function loadSlotsForDate(date) {
+    const slot = document.querySelector('.slots');
+    slot.innerHTML = ""; // clear slots before loop
+    slot.style.display = 'none'; // hide initially
+
+    const no_datas = document.querySelector('.no-datas');
+    no_datas.style.display = 'none';
+
+    // detach previous realtime listener, if any
+    if (typeof unsubscribeSlots === 'function') {
+        unsubscribeSlots();
+    }
+
+    try {
+        // listen in realtime so seat counts update for every student
+        unsubscribeSlots = onValue(student_otp_db, (snapshot) => {
+            slot.innerHTML = "";
+            let foundSlots = false;
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // Format the date nicely for display
+                const displayDateStr = formatDisplayDate(date);
+
+                for (let key in data) {
+                    if (data[key].date === date) {
+                        foundSlots = true;
+
+                        let cap_info = document.createElement('div');
+                        cap_info.classList.add('cap-info');
+                        cap_info.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
+
+                        let inner_contents = document.createElement('div');
+                        inner_contents.classList.add('inner-contents');
+                        inner_contents.innerHTML = `
+                            <h3 id="venue-name">${data[key].venue}</h3>
+                            <p id="c">${displayDateStr} ${data[key].start_time} - ${data[key].end_time}</p>
+                        `;
+
+                        cap_info.appendChild(inner_contents);
+
+                        let arrow = document.createElement('div');
+                        arrow.classList.add('arrow');
+                        arrow.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
+                       
+                        arrow.addEventListener('click', () => {
+                            // Prepare an object with the latest slot data
+                            const slotData = {
+                                slot_key: key,
+                                venue: data[key].venue,
+                                date: date, // the date you loaded slots for
+                                start_time: data[key].start_time,
+                                end_time: data[key].end_time,
+                                total_slots: data[key].total_slots,
+                                booked_slots: data[key].booked_slots,
+                            };
+                            sessionStorage.setItem('selectedSlot', JSON.stringify(slotData));
+
+                            // Redirect to next page or perform any action
+                            window.location.href = "teacher_page_2.html";
+                        });
+
+                        cap_info.appendChild(arrow);
+
+                        slot.appendChild(cap_info);
+
+                        let span_element = document.createElement('span');
+                        span_element.id = 'a';
+                        slot.appendChild(span_element);
+
+                        let p_element = document.createElement('p');
+                        p_element.id = 'b';
+                        p_element.innerHTML = `<span id="available">${data[key].total_slots - data[key].booked_slots}</span> Seats Available`;
+                        slot.appendChild(p_element);
+                    }
+                }
+            }
+
+            if (foundSlots) {
+                slot.style.display = 'flex';
+                no_datas.style.display = 'none';
+            } else {
+                slot.style.display = 'none';
+                no_datas.style.display = 'flex';
+            }
+        });
+    } catch (error) {
+        
+        slot.style.display = 'none';
+        no_datas.style.display = 'flex';
+    }
+
+}
+function formatDisplayDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+
+loadSlotsForDate(selectedDate);
+
+</script>
