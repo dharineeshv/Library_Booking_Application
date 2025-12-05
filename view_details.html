@@ -137,97 +137,63 @@ console.log(datas);
 
 // MAIN LOGIC
 onValue(student_otp_db, (snapshot) => {
+    const container = document.querySelector("body"); // or any wrapper you want
+    const oldCards = document.querySelectorAll(".details-card[data-dynamic='true']");
+    oldCards.forEach(card => card.remove()); // remove old dynamic cards
+
     if (!snapshot.exists()) {
         console.log("No data found");
         return;
     }
 
-  const detailsDiv = document.querySelector(".details");
-detailsDiv.innerHTML = ""; // clear previous results
+    let found = false;
+    const dbData = snapshot.val();
 
-let found = false;
-const dbData = snapshot.val();
+    for (let key in dbData) {
+        let slot = dbData[key];
 
-for (let key in dbData) {
-    let slot = dbData[key];
+        if (
+            slot.venue === datas.venue_name &&
+            slot.date === datas.date &&
+            slot.start_time === datas.time
+        ) {
+            found = true;
 
-    if (
-        slot.venue === datas.venue_name &&
-        slot.date === datas.date &&
-        slot.start_time === datas.time
-    ) {
-        found = true;
+            // NEW details-card for each student
+            let card = document.createElement("div");
+            card.classList.add("details-card");
+            card.setAttribute("data-dynamic", "true");
+            card.style.justifyContent = "flex-start";
 
-        // Create a container div for this slot's details and icon
-        let slotCard = document.createElement("div");
-        slotCard.classList.add("slot-card");
-        slotCard.style.display = "flex";
-        slotCard.style.gap = "15px";
-        slotCard.style.alignItems = "center";
-        slotCard.style.marginBottom = "15px";
-        slotCard.style.padding = "10px";
-       
-        slotCard.style.borderRadius = "10px";
-        
-       
+            let icon = document.createElement("div");
+            icon.classList.add("profile-icon");
+            icon.innerHTML = `<i class="fa-regular fa-user"></i>`;
+            card.appendChild(icon);
 
-        // Create profile icon div
-        let icon = document.createElement("div");
-        icon.classList.add("profile-icon");
-        icon.innerHTML = `<i class="fa-regular fa-user"></i>`;
-        slotCard.appendChild(icon);
+            let details = document.createElement("div");
+            details.classList.add("details");
 
-        // Create details container
-        let detailsContainer = document.createElement("div");
-        detailsContainer.style.display = "flex";
-        detailsContainer.style.flexDirection = "column";
-        detailsContainer.style.gap = "6px";
+            const fields = [
+                { label: "Name:", value: slot.student_name || "Unknown" },
+                { label: "Email:", value: slot.student_email },
+                { label: "Venue:", value: slot.venue }
+            ];
 
-        // Append fields: Name, Email, Venue
-        const fields = [
-            { label: "Name:", value: slot.student_name || "Unknown" },
-            { label: "Email:", value: slot.student_email },
-            { label: "Venue:", value: slot.venue }
-        ];
+            fields.forEach(data => {
+                let row = document.createElement("div");
+                row.classList.add("inner-detail");
+                row.innerHTML = `<h4>${data.label}</h4><p>${data.value}</p>`;
+                details.appendChild(row);
+            });
 
-        fields.forEach(({ label, value }) => {
-            let div = document.createElement("div");
-            div.classList.add("inner-detail");
-            div.style.display = "flex";
-            div.style.gap = "15px";
-            div.style.alignItems = "center";
-
-            let h4 = document.createElement("h4");
-            h4.style.width = "110px";
-            h4.style.textAlign = "right";
-            h4.style.fontWeight = "600";
-            h4.textContent = label;
-
-            let p = document.createElement("p");
-            p.style.fontSize = "15px";
-            p.style.marginLeft = "10px";
-            p.textContent = value;
-
-            div.appendChild(h4);
-            div.appendChild(p);
-            detailsContainer.appendChild(div);
-        });
-
-        slotCard.appendChild(detailsContainer);
-        
-
-        let hr = document.createElement("hr");
-        detailsDiv.appendChild(slotCard);
-        document.querySelector(".details-card").appendChild(hr);
-
-
-
+            card.appendChild(details);
+            container.appendChild(card);
+        }
     }
-}
 
-if (!found) {
-    detailsDiv.innerHTML = "<p>No matching slot found.</p>";
-}
-
+    if (!found) {
+        alert("No matching slot found.");
+    }
 });
+
 </script>
