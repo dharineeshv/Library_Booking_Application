@@ -160,6 +160,46 @@
     #google-btn:hover {
       background-color: rgba(32, 32, 32, 0.85);
     }
+/* Google Button Container */
+#g_id_signin {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Force Google button to fit width nicely */
+#g_id_signin > div {
+  width: 100% !important;
+  min-height: 42px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Tablet responsiveness */
+@media (max-width: 768px) {
+  #g_id_signin {
+    width: 100%;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  #g_id_signin {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  #g_id_signin > div {
+    width: 100% !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  #g_id_signin > div {
+    transform: scale(0.95); /* slightly small fit */
+  }
+}
 
     /* Responsive for smaller screens */
     @media (max-width: 480px) {
@@ -289,5 +329,6 @@
 
     };
 </script>
+
 
 
