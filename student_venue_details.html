@@ -420,7 +420,13 @@ async function confirmed() {
     disableBookingButton();
 
  let email = sessionStorage.getItem("userEmail");
-let username = email.split("@")[0].replace(/[0-9]/g, "");
+
+let name = email
+    .split("@")[0]          // get part before @
+    .replace(/[^a-zA-Z]/g, "") // remove everything except letters
+    .toUpperCase();            // convert to uppercase
+
+
 
 
     let booked_status = document.querySelector(".booked-status");
@@ -428,7 +434,7 @@ let username = email.split("@")[0].replace(/[0-9]/g, "");
     booked_status.style.display = "flex";
 
     booked_status.innerHTML += `
-        <div class="a"><h4>Name</h4><p>${username}</p></div>
+        <div class="a"><h4>Name</h4><p>${name}</p></div>
         <div class="a"><h4>Email</h4><p>${email}</p></div>
         
     `;
@@ -458,3 +464,4 @@ let username = email.split("@")[0].replace(/[0-9]/g, "");
     }
 }
 </script>
+
