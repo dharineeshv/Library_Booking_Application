@@ -382,7 +382,23 @@ function loadSlotsForDate(date) {
       document.querySelector('.no-datas').style.display = 'flex';
       slotList.style.display = 'none';
     }
+
+
+let viewBtn = card.querySelector(".view-btn");
+viewBtn.addEventListener("click", () => {
+
+  let view_datas = {
+    venue_name: slot.venue,
+    date: slot.date,
+    time: slot.start_time
+  };
+
+  sessionStorage.setItem("view_datas", JSON.stringify(view_datas));
+  window.location.href = "view_details.html";
+});
+
   });
+
 }
 
 // Initial load
@@ -394,6 +410,8 @@ loadSlotsForDate(selectedDate);
 document.querySelector('.calendar-btn').addEventListener('click', () => {
     document.getElementById('datePicker').showPicker();
 });
+
+
 
 
   </script>
