@@ -129,12 +129,17 @@
     display: block;
   }
   .button {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    margin-top: 45vh;
-  }
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: transparent;
+  padding: 10px;
+}
+
   button:hover {
     background-color: #0052cc;
   }
@@ -456,3 +461,4 @@ async function confirmed() {
     }
 }
 </script>
+
