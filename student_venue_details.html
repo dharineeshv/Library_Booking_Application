@@ -118,7 +118,8 @@
   }
   button {
     padding: 12px 20px;
-    width: 40%;
+     width: 80%;
+  max-width: 350px;
     background-color: #0066ff;
     color: white;
     border: none;
@@ -129,11 +130,15 @@
     display: block;
   }
   .button {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    margin-top: 45vh;
+   
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  background: transparent;
+
   }
   button:hover {
     background-color: #0052cc;
@@ -465,5 +470,6 @@ let name = namePart.match(/^[A-Za-z]+/)[0].toUpperCase();
     }
 }
 </script>
+
 
 
