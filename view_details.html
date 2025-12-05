@@ -133,66 +133,51 @@ onValue(student_otp_db, (snapshot) => {
         return;
     }
 
-    const detailsDiv = document.querySelector(".details");
-    detailsDiv.innerHTML = ""; // RESET so duplicates won't appear
+   const detailsDiv = document.querySelector(".details");
+detailsDiv.innerHTML = ""; // RESET so duplicates won't appear
 
-    let found = false;
+let found = false;
 
-    const dbData = snapshot.val();
+const dbData = snapshot.val();
 
-    for (let key in dbData) {
-        let slot = dbData[key];
+let iconAdded = false; // flag to add icon only once
 
-        if (
-            slot.venue === datas.venue_name &&
-            slot.date === datas.date &&
-            slot.start_time === datas.time
-        ) {
-            found = true;
+for (let key in dbData) {
+    let slot = dbData[key];
 
-            // Create profile icon once for each user
+    if (
+        slot.venue === datas.venue_name &&
+        slot.date === datas.date &&
+        slot.start_time === datas.time
+    ) {
+        found = true;
+
+        if (!iconAdded) {
             let icon = document.createElement("div");
             icon.classList.add("profile-icon");
             icon.innerHTML = `<i class="fa-regular fa-user"></i>`;
             document.querySelector(".details-card").prepend(icon);
-
-            // ------------------
-            // NAME FIELD
-            // ------------------
-            let div1 = document.createElement("div");
-            div1.classList.add("inner-detail");
-            div1.innerHTML = `
-                <h4>Name:</h4>
-                <p>${slot.student_name || "Unknown"}</p>
-            `;
-            detailsDiv.append(div1);
-
-            // ------------------
-            // EMAIL FIELD
-            // ------------------
-            let div2 = document.createElement("div");
-            div2.classList.add("inner-detail");
-            div2.innerHTML = `
-                <h4>Email:</h4>
-                <p>${slot.student_email}</p>
-            `;
-            detailsDiv.append(div2);
-
-            // ------------------
-            // VENUE FIELD
-            // ------------------
-            let div3 = document.createElement("div");
-            div3.classList.add("inner-detail");
-            div3.innerHTML = `
-                <h4>Venue:</h4>
-                <p>${slot.venue}</p>
-            `;
-            detailsDiv.append(div3);
+            iconAdded = true;
         }
-    }
 
-    if (!found) {
-        console.log("No matching slot found.");
+        // Append fields
+        const fields = [
+          { label: "Name:", value: slot.student_name || "Unknown" },
+          { label: "Email:", value: slot.student_email },
+          { label: "Venue:", value: slot.venue }
+        ];
+
+        fields.forEach(({label, value}) => {
+          let div = document.createElement("div");
+          div.classList.add("inner-detail");
+          div.innerHTML = `<h4>${label}</h4><p>${value}</p>`;
+          detailsDiv.append(div);
+        });
     }
+}
+
+if (!found) {
+    detailsDiv.innerHTML = "<p>No matching slot found.</p>";
+}
 });
 </script>
