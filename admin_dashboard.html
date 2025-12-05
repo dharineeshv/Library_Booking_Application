@@ -319,11 +319,12 @@ datePicker.addEventListener('change', () => {
 
 function loadSlotsForDate(date) {
   selectedDate = date;
-  let slotList = document.getElementById("slotList");
-  slotList.innerHTML = "";
+  
   off(student_otp_db);
   onValue(student_otp_db, function (snapshot) {
     let found = false;
+    let slotList = document.getElementById("slotList");
+  slotList.innerHTML = "";
     if (snapshot.exists()) {
       let data = snapshot.val();
       for (let key in data) {
@@ -413,4 +414,5 @@ document.querySelector('.calendar-btn').addEventListener('click', () => {
   </script>
 </body>
 </html>
+
 
