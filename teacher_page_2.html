@@ -279,6 +279,8 @@ onValue(student_booking_db, (snapshot) => {
                 found = true;
                 let search = document.querySelector('.search');
                 search.style.display = "flex";
+                 
+             
                 let student_id = data[key].student_id;
                 let venue = data[key].venue;
                 let date = data[key].date;
@@ -315,7 +317,7 @@ onValue(student_booking_db, (snapshot) => {
                     updateUI();
                 });
 
-                // Reject button event
+                
                 document.getElementById(`reject-${key}`).addEventListener("click", () => {
                     remove(ref(database, "Bookings/" + key));
                     card.remove();
@@ -348,6 +350,26 @@ onValue(student_booking_db, (snapshot) => {
 
    
 });
+document.getElementById("search-btn").addEventListener("click", () => {
+    let searchValue = document.getElementById("search").value.toLowerCase();
+    let cards = document.querySelectorAll(".booking-card");
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        let id = card.querySelector("span").textContent.toLowerCase();
+        if(id.includes(searchValue)) {
+            card.style.display = "flex";
+            visibleCount++;
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    if (visibleCount === 0) {
+        showToast("No matching Student ID found!", "error");
+    }
+});
+
 
 function showToast(message, type) {
     const toast = document.getElementById("toast");
@@ -367,9 +389,13 @@ function updateUI() {
     if (datasContainer.children.length === 0) {
         noDatasContainer.style.display = "flex";
         datasContainer.style.display = "none";
+         let search = document.querySelector('.search');
+          search.style.display = "none";
     } else {
         noDatasContainer.style.display = "none";
         datasContainer.style.display = "flex";
+        let search = document.querySelector('.search');
+          search.style.display = "flex";
     }
 }
 
