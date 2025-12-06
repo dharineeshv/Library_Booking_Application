@@ -12,6 +12,15 @@
         <h3>Verification Queue</h3>
     </div>
 
+<div class="search">
+    <div class="search-box">
+        <input type="text" placeholder="Search Student ID" id="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+    <button id="search-btn">Search</button>
+</div>
+
+
     <div class="no-datas">
         <i class="fa-regular fa-circle-check"></i>
         <h3>All Caught Up!</h3>
@@ -41,6 +50,50 @@
     background: #f7f9fc;
     color: #222;
   }
+  .search {
+    display:none;
+    margin-top:10px;
+    justify-content: center;
+    gap:10px;
+  }
+  input 
+  {
+    border:none;
+    padding:10px;
+    width:80%;
+    font-weight: 600px;
+    font-size: 1em;
+    
+    
+  }
+  #search {
+    border-radius: 10px;
+
+  }
+  .search-box {
+    position: relative;
+    width: 80%;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 35px 10px 10px; /* extra right padding */
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.search-box i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #444;
+    cursor: pointer;
+}
+
   .nav-container {
     display:flex;
     gap:40%;
@@ -54,6 +107,9 @@
   gap: 10px;
   align-items: center;
 
+}
+#search-btn {
+  background-color:rgba(0, 0, 255, 0.689);
 }
 button {
     padding:8px;
@@ -221,6 +277,8 @@ onValue(student_booking_db, (snapshot) => {
 ) {
                 
                 found = true;
+                let search = document.querySelector('.search');
+                search.style.display = "flex";
                 let student_id = data[key].student_id;
                 let venue = data[key].venue;
                 let date = data[key].date;
@@ -278,12 +336,19 @@ onValue(student_booking_db, (snapshot) => {
             }
         }
     }
+    if(found)
+    {
+        document.querySelector('.no-datas').style.display = "none";
+         let search = document.querySelector('.search');
+          search.style.display = "flex";
+    }
+    else{
+       document.querySelector('.no-datas').style.display = "flex";
+    }
 
-    document.querySelector('.no-datas').style.display = found ? "none" : "flex";
+   
 });
 
-
-// Toast Function
 function showToast(message, type) {
     const toast = document.getElementById("toast");
     toast.textContent = message;
