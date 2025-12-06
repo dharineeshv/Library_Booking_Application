@@ -236,6 +236,79 @@ button {
 .verify .verify-btn:hover {
     background-color: #0050c7;
 }
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .nav-container {
+    gap: 20%;
+    padding: 12px;
+  }
+
+  .search {
+    flex-direction: row;
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .datas {
+    flex-direction: column;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .nav-container {
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .nav-container h3 {
+    font-size: 16px;
+  }
+
+  .fa-solid.fa-arrow-left {
+    font-size: 18px;
+  }
+
+  .search {
+    width: 100%;
+    padding: 0 10px;
+    gap: 6px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  #search-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .booking-card {
+    flex-direction: row;
+    gap: 5px;
+    padding: 10px;
+  }
+
+  .inner-content h4 {
+    font-size: 14px;
+  }
+
+  .inner-content p {
+    font-size: 11px;
+  }
+
+  .verify button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  #toast {
+    width: auto;
+    font-size: 12px;
+    padding: 10px;
+  }
+}
 
 
 </style>
