@@ -309,6 +309,39 @@ button {
     padding: 10px;
   }
 }
+    /* Tablet & Mobile Fix */
+@media (max-width: 1024px) {
+
+  /* Center text of No Data message */
+  .no-datas {
+    text-align: center;
+    padding: 0 20px;
+  }
+  .no-datas p {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Keep arrow left and center the heading */
+  .nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  #left {
+    position: absolute;
+    left: 10px;
+    font-size: 20px;
+  }
+  .nav-container h3 {
+    text-align: center;
+    width: 100%;
+    font-size: 18px;
+  }
+
+}
+
 
 
 </style>
